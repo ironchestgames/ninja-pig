@@ -31,7 +31,7 @@ var heightInPixels
 var stageToNinjaOffsetX
 
 var world
-var bodiesToRemove = []
+var coinBodiesToRemove = []
 
 var buttonEventQueue = []
 var BUTTON_UPWARD_DOWN = 'BUTTON_UPWARD_DOWN'
@@ -322,6 +322,11 @@ var createHookSprite = function (layer) {
   layer.addChild(ropeSprite)
 }
 
+var isBodyCoin = function (body) {
+  return body.name === 'nothing_coin' ||
+      body.name === 'jump_coin'
+}
+
 var postStep = function () {
   var buttonEvent
 
@@ -382,14 +387,6 @@ var postStep = function () {
   }
 
   actionsLog('STEP')
-
-  // remove bodies from bodiesToRemove
-  while (bodiesToRemove.length > 0) {
-    var body = bodiesToRemove.pop()
-    var sprite = dynamicSprites[body.id]
-    mapLayer.removeChild(sprite)
-    world.removeBody(body)
-  }
 
   // update balloon holder position
   ninjaBalloonHolderBody.position[0] = ninjaBody.position[0]
@@ -539,6 +536,14 @@ var postStep = function () {
 
   balloonManager.postStep()
 
+  // coins post step
+  while (coinBodiesToRemove.length > 0) {
+    var body = coinBodiesToRemove.pop()
+    var sprite = dynamicSprites[body.id]
+    mapLayer.removeChild(sprite)
+    world.removeBody(body)
+  }
+
 }
 
 var beginContact = function (contactEvent) {
@@ -593,12 +598,11 @@ var beginContact = function (contactEvent) {
       (contactEvent.bodyA.name === 'jump_coin' || contactEvent.bodyB.name === 'jump_coin'))) {
 
     var coinBody = contactEvent.bodyA
-    if (contactEvent.bodyA.name === 'ninjaBody') {
+    if (isBodyCoin(contactEvent.bodyB)) {
       coinBody = contactEvent.bodyB
     }
 
-    world.removeBody(coinBody)
-    dynamicSprites[coinBody.id].destroy()
+    coinBodiesToRemove.push(coinBody)
   }
 }
 
@@ -642,8 +646,6 @@ var gameScene = {
     world.islandSplit = false // TODO: figure out why island splitting doesnt work
 
     window.world = world // TODO: remove before prod
-
-    bodiesToRemove = []
 
     // set up layers
     this.container = new PIXI.Container()
