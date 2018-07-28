@@ -59436,11 +59436,6 @@ var setUpGameRenderer = function () {
   })
   debugTexts.addChild(fpsText)
 
-  window.onresize = function () {
-    global.renderer.resize(window.innerWidth, window.innerHeight)
-    console.log('hej', window.innerWidth, window.innerHeight)
-  }
-
 }
 
 windowLoad(function () {
