@@ -59400,7 +59400,48 @@ var ob = require('obscen')
 var windowLoad = require('window-load')
 var screenOrientation = require('screen-orientation')
 
-global.levelCount = 4 // TODO: move to some level manager when it exists
+var fpsText
+var LANDSCAPE = 'landscape'
+var PORTRAIT = 'portrait'
+var savedDisplayValue
+var isGameShowing = false
+var turnDeviceElement
+
+var setUpGameRenderer = function () {
+
+  // init pixi renderer
+  var noWebgl = !!localStorage.getItem('vars:noWebgl')
+  var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, {}, noWebgl)
+  document.body.appendChild(renderer.view)
+  renderer.backgroundColor = 0x261D05
+
+  var appContainer = new PIXI.Container()
+  var baseStage = new PIXI.Container()
+  var debugTexts = new PIXI.Container()
+
+  appContainer.addChild(baseStage)
+  appContainer.addChild(debugTexts)
+
+  global.appContainer = appContainer
+  global.baseStage = baseStage
+  global.renderer = renderer
+
+  // debug monitor text
+  if (!global.DEBUG_MONITOR) {
+    debugTexts.visible = false
+  }
+
+  fpsText = new PIXI.Text('This is a pixi text', {
+    fill: 0x00ff00,
+  })
+  debugTexts.addChild(fpsText)
+
+  window.onresize = function () {
+    global.renderer.resize(window.innerWidth, window.innerHeight)
+    console.log('hej', window.innerWidth, window.innerHeight)
+  }
+
+}
 
 windowLoad(function () {
 
@@ -59409,114 +59450,86 @@ windowLoad(function () {
   global.DEBUG_DRAW = !!localStorage.getItem('DEBUG_DRAW')
   global.DEBUG_MONITOR = !!localStorage.getItem('DEBUG_MONITOR')
 
-  var noWebgl = !!localStorage.getItem('vars:noWebgl')
-
-  // init pixi renderer
-  var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, {}, noWebgl)
-  document.body.appendChild(renderer.view)
-  renderer.backgroundColor = 0x261D05
-
-  window.onresize = function () {
-    renderer.resize(window.innerWidth, window.innerHeight)
-  }
-
   // init obscen
   var sceneManager = new ob.SceneManager()
 
   sceneManager.setScenes([
     splashScene,
-    intro1Scene,
     loadScene,
+    intro1Scene,
     gameScene,
     levelWonScene,
     levelFailScene,
     ])
 
-  var appContainer = new PIXI.Container()
-  var baseStage = new PIXI.Container()
-  var turnDeviceContainer = new PIXI.Container()
-  var debugTexts = new PIXI.Container()
-
-  appContainer.addChild(baseStage)
-  appContainer.addChild(turnDeviceContainer)
-  appContainer.addChild(debugTexts)
-
-  global.baseStage = baseStage
-  global.renderer = renderer
-  global.sceneManager = sceneManager
-
-  // debug monitor text
-  if (!global.DEBUG_MONITOR) {
-    debugTexts.visible = false
-  }
-
-  var fpsText = new PIXI.Text('This is a pixi text', {
-    fill: 0x00ff00,
-  })
-  debugTexts.addChild(fpsText)
-
-  // turn device graphics
-  var turnDeviceBackground = new PIXI.Graphics()
-  turnDeviceBackground.beginFill(0x292929)
-  turnDeviceBackground.drawRect(0, 0, 8, 8)
-  turnDeviceBackground.scale.x = 200
-  turnDeviceBackground.scale.y = 300
-  turnDeviceBackground.endFill()
-  turnDeviceContainer.addChild(turnDeviceBackground)
-
-  var turnDeviceText = new PIXI.Text('Turn device to landscape', {
-    fill: 0xfcfcfc,
-  })
-  turnDeviceText.x = 200
-  turnDeviceText.y = 200
-  turnDeviceContainer.addChild(turnDeviceText)
-
   // init browserGameLoop
   var loop = browserGameLoop({
-      updateTimeStep: 1000 / 30,
-      fpsFilterStrength: 20,
-      slow: 1,
-      input: function() {},
-      update: function(step) {
-        if (screenOrientation().direction === 'portrait') {
-          turnDeviceContainer.visible = true
-        } else {
-          turnDeviceContainer.visible = false
-          sceneManager.update(step)
+    updateTimeStep: 1000 / 30,
+    fpsFilterStrength: 20,
+    slow: 1,
+    input: function() {},
+    update: function(step) {
+      if (screenOrientation().direction === LANDSCAPE) {
+        global.sceneManager.update(step)
+      }
+    },
+    render: function(ratio) {
+      if (screenOrientation().direction === LANDSCAPE) {
+
+        if (isGameShowing === false) {
+          isGameShowing = true
+          turnDeviceElement.style.visibility = 'hidden'
+          global.renderer.view.style.display = savedDisplayValue
         }
-      },
-      render: function(ratio) {
-        if (screenOrientation().direction === 'portrait') {
-          turnDeviceContainer.visible = true
-        } else {
-          turnDeviceContainer.visible = false
-          sceneManager.draw(renderer, ratio)
-        }
+
+        global.sceneManager.draw(renderer, ratio)
         fpsText.text = 'fps: ' + Math.round(loop.getFps()) + '\nscreen orientation: ' + screenOrientation().direction
-        renderer.render(appContainer)
-      },
+        global.renderer.render(global.appContainer)
+
+      } else {
+
+        if (isGameShowing === true) {
+          isGameShowing = false
+          turnDeviceElement.style.visibility = 'visible'
+          global.renderer.view.style.display = 'none'
+        }
+
+      }
+    },
   })
+
+  global.sceneManager = sceneManager
   global.loop = loop
 
+  lastOrientation = screenOrientation().direction
+
+  turnDeviceElement = document.getElementById('turn_to_landscape')
+
   var intervalId = setInterval(function () {
-    if (screenOrientation().direction === 'portrait') {
-      turnDeviceContainer.visible = true
-      renderer.render(appContainer)
+    if (screenOrientation().direction === LANDSCAPE) {
+
+      // hide turn device icon
+      turnDeviceElement.style.visibility = 'hidden'
+
+      // set up everything pixi for the game
+      setUpGameRenderer()
+
+      // start with load scene
+      global.sceneManager.changeScene('load')
+
+      // start!
+      isGameShowing = true
+      savedDisplayValue = global.renderer.view.style.display
+      clearInterval(intervalId)
+      global.loop.start()
+
     } else {
 
-      // start it!
-      clearInterval(intervalId)
-
-      sceneManager.changeScene('load', {
-        level: localStorage.level || 'level1', // TODO: remove in prod
-      })
-
-      loop.start()
+      turnDeviceElement.style.visibility = 'visible'
     }
   }, 100)
   
 })
-
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./gameScene.js":281,"./intro1Scene.js":285,"./levelFailScene.js":286,"./levelWonScene.js":287,"./loadScene.js":288,"./splashScene.js":289,"./version":290,"browser-game-loop":2,"obscen":16,"pixi.js":212,"screen-orientation":263,"window-load":269}],285:[function(require,module,exports){
 (function (global){
@@ -59898,6 +59911,13 @@ var loadScene = {
       theme: gameVars.themes.sunsetCity,
     })
 
+    // set level as per localStorage for debugging TODO: remove this in prod
+    var startingLevelName = localStorage.level || global.levelManager.levelProgression[0].name
+    global.levelManager.setCurrentLevel(
+        global.levelManager.levelProgression.findIndex(function (level) {
+          return level.name === startingLevelName
+        }))
+
     // fetch assets
     PIXI.loader
 
@@ -60070,7 +60090,7 @@ module.exports = splashScene
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./KeyButton":274,"./buttonAreaFactory":280}],290:[function(require,module,exports){
-module.exports = "1.0.0-17"
+module.exports = "1.0.0-18"
 
 },{}],291:[function(require,module,exports){
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
