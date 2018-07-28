@@ -35,6 +35,13 @@ var loadScene = {
       theme: gameVars.themes.sunsetCity,
     })
 
+    // set level as per localStorage for debugging TODO: remove this in prod
+    var startingLevelName = localStorage.level || global.levelManager.levelProgression[0].name
+    global.levelManager.setCurrentLevel(
+        global.levelManager.levelProgression.findIndex(function (level) {
+          return level.name === startingLevelName
+        }))
+
     // fetch assets
     PIXI.loader
 
