@@ -1,6 +1,6 @@
 {
   "name": "ninja-pig",
-  "version": "1.0.0-18",
+  "version": "1.0.0-19",
   "description": "Ninja Pig",
   "main": "src/js/index.js",
   "scripts": {
