@@ -32,7 +32,7 @@ var loadScene = {
     .addLevel({
       name: 'level4',
       gameMode: null,
-      theme: gameVars.themes.sunsetCity,
+      theme: gameVars.themes.nightCity,
     })
 
     // set level as per localStorage for debugging TODO: remove this in prod
@@ -67,6 +67,8 @@ var loadScene = {
     .add('backgroundsky2', 'assets/images/backgroundsky2.png')
     .add('background3', 'assets/images/background3.png')
     .add('backgroundsky3', 'assets/images/backgroundsky3.png')
+    .add('background4', 'assets/images/background4.png')
+    .add('backgroundsky4', 'assets/images/backgroundsky4.png')
     .add('antenn001', 'assets/images/antenn001.png')
     .add('antenn002', 'assets/images/antenn002.png')
     .add('box001', 'assets/images/box001.png')

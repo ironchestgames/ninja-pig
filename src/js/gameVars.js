@@ -28,6 +28,11 @@ gameVars.themes = {
     backgroundIndex: 3,
     balloonColors: [1, 2, 3, 5, 6, 7, 9],
   },
+  nightCity: {
+    staticsColor: 0x01020E,
+    backgroundIndex: 4,
+    balloonColors: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+  },
 }
 
 module.exports = gameVars
