@@ -12,7 +12,7 @@ var loadScene = {
     .addLevel({
       name: 'level5',
       gameMode: global.levelManager.GAME_MODES.TUTORIAL_JUMP,
-      theme: gameVars.themes.daylightCity,
+      theme: gameVars.themes.sunriseJungle,
     })
     .addLevel({
       name: 'level1',
@@ -65,6 +65,8 @@ var loadScene = {
     .add('backgroundsky1', 'assets/images/backgroundsky1.png')
     .add('background2', 'assets/images/background2.png')
     .add('backgroundsky2', 'assets/images/backgroundsky2.png')
+    .add('background3', 'assets/images/background3.png')
+    .add('backgroundsky3', 'assets/images/backgroundsky3.png')
     .add('antenn001', 'assets/images/antenn001.png')
     .add('antenn002', 'assets/images/antenn002.png')
     .add('box001', 'assets/images/box001.png')

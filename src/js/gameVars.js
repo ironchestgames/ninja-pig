@@ -23,6 +23,11 @@ gameVars.themes = {
     backgroundIndex: 2,
     balloonColors: [1, 2, 3, 5, 6, 7, 9],
   },
+  sunriseJungle: {
+    staticsColor: 0x2F3B02,
+    backgroundIndex: 3,
+    balloonColors: [1, 2, 3, 5, 6, 7, 9],
+  },
 }
 
 module.exports = gameVars
