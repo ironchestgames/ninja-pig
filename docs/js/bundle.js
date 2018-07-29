@@ -57574,6 +57574,7 @@ var MapLoader = function () {
 
 MapLoader.prototype.loadMap = function (config) {
 
+  var balloonColors
   var bodiesData
   var body
   var bodyData
@@ -57616,6 +57617,7 @@ MapLoader.prototype.loadMap = function (config) {
   ninjaRadius = config.ninjaRadius
   pixelsPerMeter = config.pixelsPerMeter
   staticsColor = config.theme.staticsColor
+  balloonColors = config.theme.balloonColors
   levelName = config.name
 
   // props first (rendered below the level as of now)
@@ -57793,7 +57795,7 @@ MapLoader.prototype.loadMap = function (config) {
 
       world.addBody(body)
 
-      var balloonTextureNr = gameUtils.getRandomInt(1, 9)
+      var balloonTextureNr = balloonColors[gameUtils.getRandomInt(0, balloonColors.length - 1)]
 
       // create the sprite
       var sprite = new PIXI.Sprite(PIXI.loader.resources['balloon' + balloonTextureNr].texture)
@@ -58996,7 +58998,8 @@ var gameScene = {
 
     // set up background layer contents
     // NOTE: bc of the nature of the image it has to be this exact square (suns/moons are round)
-    skySprite = new PIXI.Sprite(PIXI.loader.resources['backgroundsky1'].texture)
+    skySprite = new PIXI.Sprite(
+        PIXI.loader.resources['backgroundsky' + currentLevel.theme.backgroundIndex].texture)
     skySprite.anchor.x = 0.5
     skySprite.anchor.y = 0.5
     skySprite.position.x = global.renderer.view.width / 2
@@ -59006,7 +59009,7 @@ var gameScene = {
 
     // NOTE: bc of the nature of the image it doesn't matter that much to stretch it
     backgroundSprite = new PIXI.extras.TilingSprite(
-        PIXI.loader.resources['background1'].texture,
+        PIXI.loader.resources['background' + currentLevel.theme.backgroundIndex].texture,
         512,
         512)
     backgroundSprite.tileScale.x = global.renderer.view.height / 512
@@ -59379,7 +59382,24 @@ gameVars.COIN = Math.pow(2, 7)
 gameVars.themes = {
   sunsetCity: {
     staticsColor: 0x261d05,
-  }
+    backgroundIndex: 1,
+    balloonColors: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+  },
+  daylightCity: {
+    staticsColor: 0x374C5F,
+    backgroundIndex: 2,
+    balloonColors: [1, 2, 3, 5, 6, 7, 9],
+  },
+  sunriseJungle: {
+    staticsColor: 0x2F3B02,
+    backgroundIndex: 3,
+    balloonColors: [1, 2, 3, 5, 6, 7, 9],
+  },
+  nightCity: {
+    staticsColor: 0x01020E,
+    backgroundIndex: 4,
+    balloonColors: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+  },
 }
 
 module.exports = gameVars
@@ -59561,31 +59581,13 @@ var intro1Scene = {
     for (var i = 1; i <= frameCount; i++) {
       var frameSprite = new PIXI.Sprite(PIXI.loader.resources['intro1_' + i].texture)
       frameSprite.anchor.x = 0.5
-      frameSprite.height = this.animationLayer.height * 0.75
+      frameSprite.height = this.animationLayer.height * 0.85
       frameSprite.scale.x = frameSprite.scale.y
       frameSprite.x = this.animationLayer.width / 2
       frameSprite.y = this.animationLayer.height * 0.05
       this.animationLayer.addChild(frameSprite)
       frameSprites[i] = frameSprite
     }
-    
-    // create gui layer
-    var buttonY = frameSprites[1].y + frameSprites[1].height
-    var buttonWidthSpace = (global.renderer.view.width - frameSprites[1].width) / 2
-    var imageButtonBack = new PIXI.Sprite(PIXI.loader.resources['button_back'].texture)
-    imageButtonBack.anchor.x = 0.5
-    imageButtonBack.anchor.y = 0.5
-    imageButtonBack.x = buttonWidthSpace / 2
-    imageButtonBack.y = buttonY
-
-    var imageButtonForward = new PIXI.Sprite(PIXI.loader.resources['button_next'].texture)
-    imageButtonForward.anchor.x = 0.5
-    imageButtonForward.anchor.y = 0.5
-    imageButtonForward.x = global.renderer.view.width - buttonWidthSpace / 2
-    imageButtonForward.y = buttonY
-
-    this.guiLayer.addChild(imageButtonBack)
-    this.guiLayer.addChild(imageButtonForward)
 
     var showFrame = function (frameId) {
       for (var i = 1; i <= frameCount; i++) {
@@ -59883,17 +59885,17 @@ var loadScene = {
     .addLevel({
       name: 'level5',
       gameMode: global.levelManager.GAME_MODES.TUTORIAL_JUMP,
-      theme: gameVars.themes.sunsetCity,
+      theme: gameVars.themes.sunriseJungle,
     })
     .addLevel({
       name: 'level1',
       gameMode: null,
-      theme: gameVars.themes.sunsetCity,
+      theme: gameVars.themes.daylightCity,
     })
     .addLevel({
       name: 'level2',
       gameMode: null,
-      theme: gameVars.themes.sunsetCity,
+      theme: gameVars.themes.daylightCity,
     })
     .addLevel({
       name: 'level3',
@@ -59903,7 +59905,7 @@ var loadScene = {
     .addLevel({
       name: 'level4',
       gameMode: null,
-      theme: gameVars.themes.sunsetCity,
+      theme: gameVars.themes.nightCity,
     })
 
     // set level as per localStorage for debugging TODO: remove this in prod
@@ -59934,6 +59936,12 @@ var loadScene = {
     .add('jump_button', 'assets/images/jump_button.png')
     .add('background1', 'assets/images/background1.png')
     .add('backgroundsky1', 'assets/images/backgroundsky1.png')
+    .add('background2', 'assets/images/background2.png')
+    .add('backgroundsky2', 'assets/images/backgroundsky2.png')
+    .add('background3', 'assets/images/background3.png')
+    .add('backgroundsky3', 'assets/images/backgroundsky3.png')
+    .add('background4', 'assets/images/background4.png')
+    .add('backgroundsky4', 'assets/images/backgroundsky4.png')
     .add('antenn001', 'assets/images/antenn001.png')
     .add('antenn002', 'assets/images/antenn002.png')
     .add('box001', 'assets/images/box001.png')
@@ -60085,7 +60093,7 @@ module.exports = splashScene
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{"./KeyButton":274,"./buttonAreaFactory":280}],290:[function(require,module,exports){
-module.exports = "1.0.0-18"
+module.exports = "1.0.0-19"
 
 },{}],291:[function(require,module,exports){
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
