@@ -31,31 +31,13 @@ var intro1Scene = {
     for (var i = 1; i <= frameCount; i++) {
       var frameSprite = new PIXI.Sprite(PIXI.loader.resources['intro1_' + i].texture)
       frameSprite.anchor.x = 0.5
-      frameSprite.height = this.animationLayer.height * 0.75
+      frameSprite.height = this.animationLayer.height * 0.85
       frameSprite.scale.x = frameSprite.scale.y
       frameSprite.x = this.animationLayer.width / 2
       frameSprite.y = this.animationLayer.height * 0.05
       this.animationLayer.addChild(frameSprite)
       frameSprites[i] = frameSprite
     }
-    
-    // create gui layer
-    var buttonY = frameSprites[1].y + frameSprites[1].height
-    var buttonWidthSpace = (global.renderer.view.width - frameSprites[1].width) / 2
-    var imageButtonBack = new PIXI.Sprite(PIXI.loader.resources['button_back'].texture)
-    imageButtonBack.anchor.x = 0.5
-    imageButtonBack.anchor.y = 0.5
-    imageButtonBack.x = buttonWidthSpace / 2
-    imageButtonBack.y = buttonY
-
-    var imageButtonForward = new PIXI.Sprite(PIXI.loader.resources['button_next'].texture)
-    imageButtonForward.anchor.x = 0.5
-    imageButtonForward.anchor.y = 0.5
-    imageButtonForward.x = global.renderer.view.width - buttonWidthSpace / 2
-    imageButtonForward.y = buttonY
-
-    this.guiLayer.addChild(imageButtonBack)
-    this.guiLayer.addChild(imageButtonForward)
 
     var showFrame = function (frameId) {
       for (var i = 1; i <= frameCount; i++) {
