@@ -16,10 +16,12 @@ gameVars.themes = {
   sunsetCity: {
     staticsColor: 0x261d05,
     backgroundIndex: 1,
+    balloonColors: [1, 2, 3, 4, 5, 6, 7, 8, 9],
   },
   daylightCity: {
     staticsColor: 0x374C5F,
     backgroundIndex: 2,
+    balloonColors: [1, 2, 3, 5, 6, 7, 9],
   },
 }
 

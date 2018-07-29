@@ -8,6 +8,7 @@ var MapLoader = function () {
 
 MapLoader.prototype.loadMap = function (config) {
 
+  var balloonColors
   var bodiesData
   var body
   var bodyData
@@ -50,6 +51,7 @@ MapLoader.prototype.loadMap = function (config) {
   ninjaRadius = config.ninjaRadius
   pixelsPerMeter = config.pixelsPerMeter
   staticsColor = config.theme.staticsColor
+  balloonColors = config.theme.balloonColors
   levelName = config.name
 
   // props first (rendered below the level as of now)
@@ -227,7 +229,7 @@ MapLoader.prototype.loadMap = function (config) {
 
       world.addBody(body)
 
-      var balloonTextureNr = gameUtils.getRandomInt(1, 9)
+      var balloonTextureNr = balloonColors[gameUtils.getRandomInt(0, balloonColors.length - 1)]
 
       // create the sprite
       var sprite = new PIXI.Sprite(PIXI.loader.resources['balloon' + balloonTextureNr].texture)
