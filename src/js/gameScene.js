@@ -672,7 +672,8 @@ var gameScene = {
 
     // set up background layer contents
     // NOTE: bc of the nature of the image it has to be this exact square (suns/moons are round)
-    skySprite = new PIXI.Sprite(PIXI.loader.resources['backgroundsky1'].texture)
+    skySprite = new PIXI.Sprite(
+        PIXI.loader.resources['backgroundsky' + currentLevel.theme.backgroundIndex].texture)
     skySprite.anchor.x = 0.5
     skySprite.anchor.y = 0.5
     skySprite.position.x = global.renderer.view.width / 2
@@ -682,7 +683,7 @@ var gameScene = {
 
     // NOTE: bc of the nature of the image it doesn't matter that much to stretch it
     backgroundSprite = new PIXI.extras.TilingSprite(
-        PIXI.loader.resources['background1'].texture,
+        PIXI.loader.resources['background' + currentLevel.theme.backgroundIndex].texture,
         512,
         512)
     backgroundSprite.tileScale.x = global.renderer.view.height / 512

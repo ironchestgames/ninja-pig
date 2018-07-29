@@ -15,7 +15,12 @@ gameVars.COIN = Math.pow(2, 7)
 gameVars.themes = {
   sunsetCity: {
     staticsColor: 0x261d05,
-  }
+    backgroundIndex: 1,
+  },
+  daylightCity: {
+    staticsColor: 0x374C5F,
+    backgroundIndex: 2,
+  },
 }
 
 module.exports = gameVars
