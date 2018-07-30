@@ -10,6 +10,11 @@ var loadScene = {
 
     global.levelManager
     .addLevel({
+      name: 'level6',
+      gameMode: global.levelManager.GAME_MODES.TUTORIAL_JUMP,
+      theme: gameVars.themes.sunriseJungle,
+    })
+    .addLevel({
       name: 'level5',
       gameMode: global.levelManager.GAME_MODES.TUTORIAL_JUMP,
       theme: gameVars.themes.sunriseJungle,
@@ -101,6 +106,7 @@ var loadScene = {
     .add('level3', 'assets/json/level3.json') // TODO: bake this into bundle.js instead
     .add('level4', 'assets/json/level4.json') // TODO: bake this into bundle.js instead
     .add('level5', 'assets/json/level5.json') // TODO: bake this into bundle.js instead
+    .add('level6', 'assets/json/level6.json') // TODO: bake this into bundle.js instead
     // .add('level' + sceneParams.level, 'assets/json/level' + sceneParams.level + '.json') // TODO: bake this into bundle.js instead
 
     // level fail scene
@@ -117,7 +123,7 @@ var loadScene = {
     .add('intro1_4', 'assets/images/intro1_4.png')
 
     .load(function () {
-      this.changeScene(localStorage.scene || 'splash', sceneParams)
+      this.changeScene(localStorage.scene || 'game', sceneParams)
     }.bind(this))
   },
   destroy: function () {
