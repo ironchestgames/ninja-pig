@@ -12,7 +12,6 @@ var buttonAreaFactory = require('./buttonAreaFactory')
 var KeyButton = require('./KeyButton')
 var BalloonManager = require('./BalloonManager')
 var BalloonIndicator = require('./BalloonIndicator')
-var TutorialButton = require('./TutorialButton')
 
 var actionsLog = debug('gameScene:actions')
 var buttonsLog = debug('gameScene:buttons')
@@ -84,8 +83,6 @@ var backgroundSprite
 var skySprite
 var dynamicSprites = {} // TODO: make sure these are destroyed properly
 var mapLayer
-var leftTutorialButton
-var rightTutorialButton
 var indicator
 var TUTORIAL_BUTTON_RUNNING = 'TUTORIAL_BUTTON_RUNNING'
 var TUTORIAL_BUTTON_IN_AIR = 'TUTORIAL_BUTTON_IN_AIR'
@@ -335,7 +332,6 @@ var postStep = function () {
 
     switch (buttonEvent) {
       case BUTTON_UPWARD_DOWN:
-        leftTutorialButton && leftTutorialButton.onDown()
         if (currentHook) {
           buttonsLog('unset current on UPWARD')
           currentHook.unsetHook()
@@ -351,7 +347,6 @@ var postStep = function () {
         break
 
       case BUTTON_FORWARD_DOWN:
-        rightTutorialButton && rightTutorialButton.onDown()
         if (currentHook) {
           buttonsLog('unset current on FORWARD')
           currentHook.unsetHook()
@@ -367,7 +362,6 @@ var postStep = function () {
         break
 
       case BUTTON_UPWARD_UP:
-        leftTutorialButton && leftTutorialButton.onUp()
         if (currentHook === upwardHook) {
           buttonsLog('unset upwardHook')
           currentHook.unsetHook()
@@ -376,7 +370,6 @@ var postStep = function () {
         break
 
       case BUTTON_FORWARD_UP:
-        rightTutorialButton && rightTutorialButton.onUp()
         if (currentHook === forwardHook) {
           buttonsLog('unset forwardHook')
           currentHook.unsetHook()
@@ -459,14 +452,8 @@ var postStep = function () {
     actionsLog('RUNNING')
     ninjaGraphics.changeState(NinjaGraphics.STATE_RUNNING)
 
-    leftTutorialButton && leftTutorialButton.changeState(TUTORIAL_BUTTON_RUNNING)
-    rightTutorialButton && rightTutorialButton.changeState(TUTORIAL_BUTTON_RUNNING)
-
   } else {
     isRunning = false
-
-    leftTutorialButton && leftTutorialButton.changeState(TUTORIAL_BUTTON_IN_AIR)
-    rightTutorialButton && rightTutorialButton.changeState(TUTORIAL_BUTTON_IN_AIR)
 
     if (ninjaGraphics.currentState !== NinjaGraphics.STATE_BOUNCED_RIGHT &&
       ninjaBody.velocity[1] > 0) {
@@ -656,13 +643,11 @@ var gameScene = {
     var propLayer = new PIXI.Container()
     var guiLayer = new PIXI.Container()
     this.debugDrawContainer = new PIXI.Container()
-    var tutorialButtonLayer = new PIXI.Container()
 
     global.baseStage.addChild(this.container)
 
     this.container.addChild(this.backgroundLayer)
     this.container.addChild(this.stage)
-    this.container.addChild(tutorialButtonLayer)
     this.container.addChild(guiLayer)
     this.container.addChild(this.debugDrawContainer)
 
@@ -779,70 +764,6 @@ var gameScene = {
       onKeyDown: onLeftDown,
       onKeyUp: onLeftUp,
     })
-
-    if (currentLevel.gameMode === global.levelManager.GAME_MODES.TUTORIAL_JUMP) {
-
-      // left buttons
-      jumpLeftTutorialButtonSprite = new PIXI.Sprite(
-          PIXI.loader.resources['jump_button'].texture)
-      jumpLeftTutorialButtonSprite.anchor.x = 0.5
-      jumpLeftTutorialButtonSprite.anchor.y = 0.5
-      jumpLeftTutorialButtonSprite.x = jumpLeftTutorialButtonSprite.width / 2
-      jumpLeftTutorialButtonSprite.y = heightInPixels - jumpLeftTutorialButtonSprite.height / 2
-      tutorialButtonLayer.addChild(jumpLeftTutorialButtonSprite)
-
-      ropeLeftTutorialButtonSprite = new PIXI.Sprite(
-          PIXI.loader.resources['upward_button'].texture)
-      ropeLeftTutorialButtonSprite.anchor.x = 0.5
-      ropeLeftTutorialButtonSprite.anchor.y = 0.5
-      ropeLeftTutorialButtonSprite.x = ropeLeftTutorialButtonSprite.width / 2
-      ropeLeftTutorialButtonSprite.y = heightInPixels - ropeLeftTutorialButtonSprite.height / 2
-      tutorialButtonLayer.addChild(ropeLeftTutorialButtonSprite)
-
-      leftTutorialButton = new TutorialButton({
-        stateSprites: [
-          {
-            state: TUTORIAL_BUTTON_RUNNING,
-            sprite: jumpLeftTutorialButtonSprite
-          },
-          {
-            state: TUTORIAL_BUTTON_IN_AIR,
-            sprite: ropeLeftTutorialButtonSprite,
-          }
-        ]
-      })
-
-      // right buttons
-      jumpRightTutorialButtonSprite = new PIXI.Sprite(
-          PIXI.loader.resources['jump_button'].texture)
-      jumpRightTutorialButtonSprite.anchor.x = 0.5
-      jumpRightTutorialButtonSprite.anchor.y = 0.5
-      jumpRightTutorialButtonSprite.x = global.renderer.view.width - jumpRightTutorialButtonSprite.width / 2
-      jumpRightTutorialButtonSprite.y = heightInPixels - jumpRightTutorialButtonSprite.height / 2
-      tutorialButtonLayer.addChild(jumpRightTutorialButtonSprite)
-
-      ropeRightTutorialButtonSprite = new PIXI.Sprite(
-          PIXI.loader.resources['forward_button'].texture)
-      ropeRightTutorialButtonSprite.anchor.x = 0.5
-      ropeRightTutorialButtonSprite.anchor.y = 0.5
-      ropeRightTutorialButtonSprite.x = global.renderer.view.width - ropeRightTutorialButtonSprite.width / 2
-      ropeRightTutorialButtonSprite.y = heightInPixels - ropeRightTutorialButtonSprite.height / 2
-      tutorialButtonLayer.addChild(ropeRightTutorialButtonSprite)
-
-      rightTutorialButton = new TutorialButton({
-        stateSprites: [
-          {
-            state: TUTORIAL_BUTTON_RUNNING,
-            sprite: jumpRightTutorialButtonSprite
-          },
-          {
-            state: TUTORIAL_BUTTON_IN_AIR,
-            sprite: ropeRightTutorialButtonSprite,
-          }
-        ]
-      })
-
-    }
 
     isPaused = false
 
