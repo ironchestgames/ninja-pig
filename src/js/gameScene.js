@@ -84,8 +84,6 @@ var skySprite
 var dynamicSprites = {} // TODO: make sure these are destroyed properly
 var mapLayer
 var indicator
-var TUTORIAL_BUTTON_RUNNING = 'TUTORIAL_BUTTON_RUNNING'
-var TUTORIAL_BUTTON_IN_AIR = 'TUTORIAL_BUTTON_IN_AIR'
 
 var ninjaBottomSensor
 var ninjaLeftSensor
