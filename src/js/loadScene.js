@@ -20,6 +20,11 @@ var loadScene = {
       theme: gameVars.themes.sunriseJungle,
     })
     .addLevel({
+      name: 'level7',
+      gameMode: null,
+      theme: gameVars.themes.daylightCity,
+    })
+    .addLevel({
       name: 'level1',
       gameMode: null,
       theme: gameVars.themes.daylightCity,
@@ -107,6 +112,7 @@ var loadScene = {
     .add('level4', 'assets/json/level4.json') // TODO: bake this into bundle.js instead
     .add('level5', 'assets/json/level5.json') // TODO: bake this into bundle.js instead
     .add('level6', 'assets/json/level6.json') // TODO: bake this into bundle.js instead
+    .add('level7', 'assets/json/level7.json') // TODO: bake this into bundle.js instead
     // .add('level' + sceneParams.level, 'assets/json/level' + sceneParams.level + '.json') // TODO: bake this into bundle.js instead
 
     // level fail scene
