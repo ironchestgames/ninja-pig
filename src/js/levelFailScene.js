@@ -20,8 +20,18 @@ var levelFailScene = {
 
     global.baseStage.addChild(this.container)
 
+    // pick image
+    var themeNamesToImageNames = {
+      sunriseJungle: 'fail_jungle',
+      daylightCity: 'fail_daylight',
+      sunsetCity: 'fail_sunset',
+      nightCity: 'fail_night',
+    }
+
     // create animation layer
-    var image = new PIXI.Sprite(PIXI.loader.resources['fail_level_1'].texture)
+    var image = new PIXI.Sprite(
+        PIXI.loader.resources[
+            themeNamesToImageNames[global.levelManager.getCurrentLevel().theme.name]].texture)
     this.animationLayer.addChild(image)
     this.animationLayer.scale.y = global.renderer.view.height / this.animationLayer.height
     this.animationLayer.scale.x = this.animationLayer.scale.y

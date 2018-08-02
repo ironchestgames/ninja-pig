@@ -14,21 +14,25 @@ gameVars.COIN = Math.pow(2, 7)
 // level themes
 gameVars.themes = {
   sunsetCity: {
+    name: 'sunsetCity',
     staticsColor: 0x261d05,
     backgroundIndex: 1,
     balloonColors: [1, 2, 3, 4, 5, 6, 7, 8, 9],
   },
   daylightCity: {
+    name: 'daylightCity',
     staticsColor: 0x374C5F,
     backgroundIndex: 2,
     balloonColors: [1, 2, 3, 5, 6, 7, 9],
   },
   sunriseJungle: {
+    name: 'sunriseJungle',
     staticsColor: 0x2F3B02,
     backgroundIndex: 3,
     balloonColors: [1, 2, 3, 5, 6, 7, 9],
   },
   nightCity: {
+    name: 'nightCity',
     staticsColor: 0x01020E,
     backgroundIndex: 4,
     balloonColors: [1, 2, 3, 4, 5, 6, 7, 8, 9],

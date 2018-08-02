@@ -116,10 +116,16 @@ var loadScene = {
     // .add('level' + sceneParams.level, 'assets/json/level' + sceneParams.level + '.json') // TODO: bake this into bundle.js instead
 
     // level fail scene
-    .add('fail_level_1', 'assets/images/fail_level_1.png')
+    .add('fail_jungle', 'assets/images/fail_jungle.png')
+    .add('fail_daylight', 'assets/images/fail_daylight.png')
+    .add('fail_sunset', 'assets/images/fail_sunset.png')
+    .add('fail_night', 'assets/images/fail_night.png')
 
     // level won scene
-    .add('finish_level_1', 'assets/images/finish_level_1.png')
+    .add('finish_jungle', 'assets/images/finish_jungle.png')
+    .add('finish_daylight', 'assets/images/finish_daylight.png')
+    .add('finish_sunset', 'assets/images/finish_sunset.png')
+    .add('finish_night', 'assets/images/finish_night.png')
 
     // intro 1 scene
     .add('intro1_bg', 'assets/images/intro1_bg.png')

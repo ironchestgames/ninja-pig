@@ -20,8 +20,18 @@ var levelWonScene = {
 
     global.baseStage.addChild(this.container)
 
+    // pick image
+    var themeNamesToImageNames = {
+      sunriseJungle: 'finish_jungle',
+      daylightCity: 'finish_daylight',
+      sunsetCity: 'finish_sunset',
+      nightCity: 'finish_night',
+    }
+
     // create animation layer
-    var image = new PIXI.Sprite(PIXI.loader.resources['finish_level_1'].texture)
+    var image = new PIXI.Sprite(
+        PIXI.loader.resources[
+            themeNamesToImageNames[global.levelManager.getCurrentLevel().theme.name]].texture)
     this.animationLayer.addChild(image)
     this.animationLayer.scale.y = global.renderer.view.height / this.animationLayer.height
     this.animationLayer.scale.x = this.animationLayer.scale.y
