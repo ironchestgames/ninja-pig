@@ -337,7 +337,7 @@ var postStep = function () {
         }
         if (isRunning) {
           shouldJump = true
-        } else {
+        } else if (currentLevel.gameMode !== global.levelManager.GAME_MODES.TUTORIAL_JUMP) {
           upwardHook.setHook()
           currentHook = upwardHook
           ninjaGraphics.flashUpwardHelpLine()
@@ -352,7 +352,7 @@ var postStep = function () {
         }
         if (isRunning) {
           shouldJump = true
-        } else {
+        } else if (currentLevel.gameMode !== global.levelManager.GAME_MODES.TUTORIAL_JUMP) {
           forwardHook.setHook()
           currentHook = forwardHook
           ninjaGraphics.flashForwardHelpLine()
