@@ -135,7 +135,7 @@ var loadScene = {
     .add('intro1_4', 'assets/images/intro1_4.png')
 
     .load(function () {
-      this.changeScene(localStorage.scene || 'game', sceneParams)
+      this.changeScene(localStorage.scene || 'splash', sceneParams)
     }.bind(this))
   },
   destroy: function () {
