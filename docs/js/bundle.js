@@ -57088,7 +57088,7 @@ BalloonManager.prototype.getClosestBalloon = function () {
 
 module.exports = BalloonManager
 
-},{"./gameUtils":282,"./gameVars":283,"p2":52}],272:[function(require,module,exports){
+},{"./gameUtils":281,"./gameVars":282,"p2":52}],272:[function(require,module,exports){
 var p2 = require('p2')
 
 var fillColorStatic = 0x333333
@@ -57918,7 +57918,7 @@ MapLoader.prototype.loadMap = function (config) {
 
 module.exports = MapLoader
 
-},{"./gameUtils":282,"./gameVars":283,"p2":52}],277:[function(require,module,exports){
+},{"./gameUtils":281,"./gameVars":282,"p2":52}],277:[function(require,module,exports){
 (function (global){
 var debug = require('debug')
 var eventLog = debug('NinjaGraphics:events')
@@ -58229,68 +58229,6 @@ module.exports = NinjaSensor
 
 },{"p2":52}],279:[function(require,module,exports){
 
-var TutorialButton = function (config) {
-
-  this.stateSprites = config.stateSprites // [{ state: 'running', sprite: PIXI.Sprite }, ...]
-  this.isDown = false
-
-  this.nextStates = []
-
-}
-
-TutorialButton.prototype.changeState = function (newState) {
-  var i
-  var nextState
-  var stateSprite
-
-  if (newState !== this.nextStates[0]) {
-    this.nextStates.push(newState)
-  }
-
-  if (!this.isDown) {
-    while (this.nextStates.length) {
-      nextState = this.nextStates.shift()
-
-      for (i = 0; i < this.stateSprites.length; i++) {
-        stateSprite = this.stateSprites[i]
-        if (stateSprite.state === nextState) {
-          stateSprite.sprite.visible = true
-        } else {
-          stateSprite.sprite.visible = false
-        }
-      }
-    }
-  }
-}
-
-TutorialButton.prototype.onDown = function () {
-  var stateSpriteScale
-
-  this.isDown = true
-
-  for (i = 0; i < this.stateSprites.length; i++) {
-    stateSpriteScale = this.stateSprites[i].sprite.scale
-    stateSpriteScale.x = 2
-    stateSpriteScale.y = 2
-  }
-}
-
-TutorialButton.prototype.onUp = function () {
-  var stateSpriteScale
-
-  this.isDown = false
-
-  for (i = 0; i < this.stateSprites.length; i++) {
-    stateSpriteScale = this.stateSprites[i].sprite.scale
-    stateSpriteScale.x = 1
-    stateSpriteScale.y = 1
-  }
-}
-
-module.exports = TutorialButton
-
-},{}],280:[function(require,module,exports){
-
 var buttonAreaFactory = function (config) {
 	var touchStart = config.touchStart
 	var touchEnd = config.touchEnd
@@ -58322,7 +58260,7 @@ var buttonAreaFactory = function (config) {
 
 module.exports = buttonAreaFactory
 
-},{}],281:[function(require,module,exports){
+},{}],280:[function(require,module,exports){
 (function (global){
 var debug = require('debug')
 var p2 = require('p2')
@@ -58338,7 +58276,6 @@ var buttonAreaFactory = require('./buttonAreaFactory')
 var KeyButton = require('./KeyButton')
 var BalloonManager = require('./BalloonManager')
 var BalloonIndicator = require('./BalloonIndicator')
-var TutorialButton = require('./TutorialButton')
 
 var actionsLog = debug('gameScene:actions')
 var buttonsLog = debug('gameScene:buttons')
@@ -58410,11 +58347,7 @@ var backgroundSprite
 var skySprite
 var dynamicSprites = {} // TODO: make sure these are destroyed properly
 var mapLayer
-var leftTutorialButton
-var rightTutorialButton
 var indicator
-var TUTORIAL_BUTTON_RUNNING = 'TUTORIAL_BUTTON_RUNNING'
-var TUTORIAL_BUTTON_IN_AIR = 'TUTORIAL_BUTTON_IN_AIR'
 
 var ninjaBottomSensor
 var ninjaLeftSensor
@@ -58661,7 +58594,6 @@ var postStep = function () {
 
     switch (buttonEvent) {
       case BUTTON_UPWARD_DOWN:
-        leftTutorialButton && leftTutorialButton.onDown()
         if (currentHook) {
           buttonsLog('unset current on UPWARD')
           currentHook.unsetHook()
@@ -58669,7 +58601,7 @@ var postStep = function () {
         }
         if (isRunning) {
           shouldJump = true
-        } else {
+        } else if (currentLevel.gameMode !== global.levelManager.GAME_MODES.TUTORIAL_JUMP) {
           upwardHook.setHook()
           currentHook = upwardHook
           ninjaGraphics.flashUpwardHelpLine()
@@ -58677,7 +58609,6 @@ var postStep = function () {
         break
 
       case BUTTON_FORWARD_DOWN:
-        rightTutorialButton && rightTutorialButton.onDown()
         if (currentHook) {
           buttonsLog('unset current on FORWARD')
           currentHook.unsetHook()
@@ -58685,7 +58616,7 @@ var postStep = function () {
         }
         if (isRunning) {
           shouldJump = true
-        } else {
+        } else if (currentLevel.gameMode !== global.levelManager.GAME_MODES.TUTORIAL_JUMP) {
           forwardHook.setHook()
           currentHook = forwardHook
           ninjaGraphics.flashForwardHelpLine()
@@ -58693,7 +58624,6 @@ var postStep = function () {
         break
 
       case BUTTON_UPWARD_UP:
-        leftTutorialButton && leftTutorialButton.onUp()
         if (currentHook === upwardHook) {
           buttonsLog('unset upwardHook')
           currentHook.unsetHook()
@@ -58702,7 +58632,6 @@ var postStep = function () {
         break
 
       case BUTTON_FORWARD_UP:
-        rightTutorialButton && rightTutorialButton.onUp()
         if (currentHook === forwardHook) {
           buttonsLog('unset forwardHook')
           currentHook.unsetHook()
@@ -58785,14 +58714,8 @@ var postStep = function () {
     actionsLog('RUNNING')
     ninjaGraphics.changeState(NinjaGraphics.STATE_RUNNING)
 
-    leftTutorialButton && leftTutorialButton.changeState(TUTORIAL_BUTTON_RUNNING)
-    rightTutorialButton && rightTutorialButton.changeState(TUTORIAL_BUTTON_RUNNING)
-
   } else {
     isRunning = false
-
-    leftTutorialButton && leftTutorialButton.changeState(TUTORIAL_BUTTON_IN_AIR)
-    rightTutorialButton && rightTutorialButton.changeState(TUTORIAL_BUTTON_IN_AIR)
 
     if (ninjaGraphics.currentState !== NinjaGraphics.STATE_BOUNCED_RIGHT &&
       ninjaBody.velocity[1] > 0) {
@@ -58981,15 +58904,15 @@ var gameScene = {
     var balloonStringLayer = new PIXI.Container()
     var propLayer = new PIXI.Container()
     var guiLayer = new PIXI.Container()
+    this.overlayLayer = new PIXI.Container()
     this.debugDrawContainer = new PIXI.Container()
-    var tutorialButtonLayer = new PIXI.Container()
 
     global.baseStage.addChild(this.container)
 
     this.container.addChild(this.backgroundLayer)
     this.container.addChild(this.stage)
-    this.container.addChild(tutorialButtonLayer)
     this.container.addChild(guiLayer)
+    this.container.addChild(this.overlayLayer)
     this.container.addChild(this.debugDrawContainer)
 
     this.stage.addChild(propLayer)
@@ -59041,6 +58964,48 @@ var gameScene = {
     guiLayer.addChild(indicatorContainer)
     guiLayer.addChild(leftButton)
     guiLayer.addChild(rightButton)
+
+    // set up overlay layer
+    var overlaySprite = new PIXI.Sprite(
+        PIXI.loader.resources['overlay'].texture)
+    overlaySprite.anchor.x = 0.5
+    overlaySprite.anchor.y = 0.5
+    overlaySprite.position.x = global.renderer.view.width / 2
+    overlaySprite.position.y = global.renderer.view.height / 2
+    overlaySprite.width = global.renderer.view.width
+    overlaySprite.height = global.renderer.view.width
+
+    this.overlayLayer.addChild(overlaySprite)
+
+    var leftThumb = new PIXI.Sprite(
+        PIXI.loader.resources['left_thumb'].texture)
+    leftThumb.anchor.x = 0
+    leftThumb.anchor.y = 1
+    leftThumb.position.x = 0
+    leftThumb.position.y = global.renderer.view.height
+
+    this.overlayLayer.addChild(leftThumb)
+
+    var rightThumb = new PIXI.Sprite(
+        PIXI.loader.resources['right_thumb'].texture)
+    rightThumb.anchor.x = 1
+    rightThumb.anchor.y = 1
+    rightThumb.position.x = global.renderer.view.width
+    rightThumb.position.y = global.renderer.view.height
+
+    this.overlayLayer.addChild(rightThumb)
+
+    var ingameInstructions = new PIXI.Sprite(
+        PIXI.loader.resources['ingame_instructions'].texture)
+    ingameInstructions.anchor.x = 0.5
+    ingameInstructions.anchor.y = 0.5
+    ingameInstructions.position.x = global.renderer.view.width / 2
+    ingameInstructions.position.y = global.renderer.view.height / 2
+
+    this.overlayLayer.addChild(ingameInstructions)
+
+    // how long to pause before showing instructions
+    this.instructionPauseTimer = 1000
 
     // set up physics
     createNinja()
@@ -59106,70 +59071,6 @@ var gameScene = {
       onKeyUp: onLeftUp,
     })
 
-    if (currentLevel.gameMode === global.levelManager.GAME_MODES.TUTORIAL_JUMP) {
-
-      // left buttons
-      jumpLeftTutorialButtonSprite = new PIXI.Sprite(
-          PIXI.loader.resources['jump_button'].texture)
-      jumpLeftTutorialButtonSprite.anchor.x = 0.5
-      jumpLeftTutorialButtonSprite.anchor.y = 0.5
-      jumpLeftTutorialButtonSprite.x = jumpLeftTutorialButtonSprite.width / 2
-      jumpLeftTutorialButtonSprite.y = heightInPixels - jumpLeftTutorialButtonSprite.height / 2
-      tutorialButtonLayer.addChild(jumpLeftTutorialButtonSprite)
-
-      ropeLeftTutorialButtonSprite = new PIXI.Sprite(
-          PIXI.loader.resources['upward_button'].texture)
-      ropeLeftTutorialButtonSprite.anchor.x = 0.5
-      ropeLeftTutorialButtonSprite.anchor.y = 0.5
-      ropeLeftTutorialButtonSprite.x = ropeLeftTutorialButtonSprite.width / 2
-      ropeLeftTutorialButtonSprite.y = heightInPixels - ropeLeftTutorialButtonSprite.height / 2
-      tutorialButtonLayer.addChild(ropeLeftTutorialButtonSprite)
-
-      leftTutorialButton = new TutorialButton({
-        stateSprites: [
-          {
-            state: TUTORIAL_BUTTON_RUNNING,
-            sprite: jumpLeftTutorialButtonSprite
-          },
-          {
-            state: TUTORIAL_BUTTON_IN_AIR,
-            sprite: ropeLeftTutorialButtonSprite,
-          }
-        ]
-      })
-
-      // right buttons
-      jumpRightTutorialButtonSprite = new PIXI.Sprite(
-          PIXI.loader.resources['jump_button'].texture)
-      jumpRightTutorialButtonSprite.anchor.x = 0.5
-      jumpRightTutorialButtonSprite.anchor.y = 0.5
-      jumpRightTutorialButtonSprite.x = global.renderer.view.width - jumpRightTutorialButtonSprite.width / 2
-      jumpRightTutorialButtonSprite.y = heightInPixels - jumpRightTutorialButtonSprite.height / 2
-      tutorialButtonLayer.addChild(jumpRightTutorialButtonSprite)
-
-      ropeRightTutorialButtonSprite = new PIXI.Sprite(
-          PIXI.loader.resources['forward_button'].texture)
-      ropeRightTutorialButtonSprite.anchor.x = 0.5
-      ropeRightTutorialButtonSprite.anchor.y = 0.5
-      ropeRightTutorialButtonSprite.x = global.renderer.view.width - ropeRightTutorialButtonSprite.width / 2
-      ropeRightTutorialButtonSprite.y = heightInPixels - ropeRightTutorialButtonSprite.height / 2
-      tutorialButtonLayer.addChild(ropeRightTutorialButtonSprite)
-
-      rightTutorialButton = new TutorialButton({
-        stateSprites: [
-          {
-            state: TUTORIAL_BUTTON_RUNNING,
-            sprite: jumpRightTutorialButtonSprite
-          },
-          {
-            state: TUTORIAL_BUTTON_IN_AIR,
-            sprite: ropeRightTutorialButtonSprite,
-          }
-        ]
-      })
-
-    }
-
     isPaused = false
 
     // NOTE: for debugging purposes only, remove in prod
@@ -59188,8 +59089,26 @@ var gameScene = {
     // leave previous/next positions accessible
     // (velocities are in units/ms)
 
-    if (isPaused) {
+    if (this.instructionPauseTimer > 0) {
+      this.instructionPauseTimer -= stepInMilliseconds
+      buttonEventQueue = [] // NOTE: empty the input
+      if (this.instructionPauseTimer < 0) {
+        isPaused = true
+      }
+    }
+
+    if (isPaused === true) {
+      if (this.overlayLayer.visible === false) {
+        this.overlayLayer.visible = true
+      }
+      if (buttonEventQueue.length > 0) {
+        isPaused = false
+      }
       return
+    } else if (isPaused === false) {
+      if (this.overlayLayer.visible === true) {
+        this.overlayLayer.visible = false
+      }
     }
 
     var stepInSeconds = stepInMilliseconds / 1000
@@ -59342,7 +59261,7 @@ var gameScene = {
 module.exports = gameScene
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../lib/spriteUtilities":291,"./BalloonIndicator":270,"./BalloonManager":271,"./DebugDraw":272,"./Hook":273,"./KeyButton":274,"./MapLoader":276,"./NinjaGraphics":277,"./NinjaSensor":278,"./TutorialButton":279,"./buttonAreaFactory":280,"./gameUtils":282,"./gameVars":283,"debug":5,"p2":52}],282:[function(require,module,exports){
+},{"../lib/spriteUtilities":290,"./BalloonIndicator":270,"./BalloonManager":271,"./DebugDraw":272,"./Hook":273,"./KeyButton":274,"./MapLoader":276,"./NinjaGraphics":277,"./NinjaSensor":278,"./buttonAreaFactory":279,"./gameUtils":281,"./gameVars":282,"debug":5,"p2":52}],281:[function(require,module,exports){
 
 var gameUtils = {}
 
@@ -59364,7 +59283,7 @@ gameUtils.getAngleBetweenPoints = function (x1, y1, x2, y2) {
 
 module.exports = gameUtils
 
-},{}],283:[function(require,module,exports){
+},{}],282:[function(require,module,exports){
 
 var gameVars = {}
 
@@ -59381,21 +59300,25 @@ gameVars.COIN = Math.pow(2, 7)
 // level themes
 gameVars.themes = {
   sunsetCity: {
+    name: 'sunsetCity',
     staticsColor: 0x261d05,
     backgroundIndex: 1,
     balloonColors: [1, 2, 3, 4, 5, 6, 7, 8, 9],
   },
   daylightCity: {
+    name: 'daylightCity',
     staticsColor: 0x374C5F,
     backgroundIndex: 2,
     balloonColors: [1, 2, 3, 5, 6, 7, 9],
   },
   sunriseJungle: {
+    name: 'sunriseJungle',
     staticsColor: 0x2F3B02,
     backgroundIndex: 3,
     balloonColors: [1, 2, 3, 5, 6, 7, 9],
   },
   nightCity: {
+    name: 'nightCity',
     staticsColor: 0x01020E,
     backgroundIndex: 4,
     balloonColors: [1, 2, 3, 4, 5, 6, 7, 8, 9],
@@ -59404,7 +59327,7 @@ gameVars.themes = {
 
 module.exports = gameVars
 
-},{}],284:[function(require,module,exports){
+},{}],283:[function(require,module,exports){
 (function (global){
 // var DebugConsole = require('./DebugConsole')
 console.log(require('./version'))
@@ -59546,7 +59469,7 @@ windowLoad(function () {
   
 })
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./gameScene.js":281,"./intro1Scene.js":285,"./levelFailScene.js":286,"./levelWonScene.js":287,"./loadScene.js":288,"./splashScene.js":289,"./version":290,"browser-game-loop":2,"obscen":16,"pixi.js":212,"screen-orientation":263,"window-load":269}],285:[function(require,module,exports){
+},{"./gameScene.js":280,"./intro1Scene.js":284,"./levelFailScene.js":285,"./levelWonScene.js":286,"./loadScene.js":287,"./splashScene.js":288,"./version":289,"browser-game-loop":2,"obscen":16,"pixi.js":212,"screen-orientation":263,"window-load":269}],284:[function(require,module,exports){
 (function (global){
 var buttonAreaFactory = require('./buttonAreaFactory')
 var KeyButton = require('./KeyButton')
@@ -59663,7 +59586,7 @@ var intro1Scene = {
 module.exports = intro1Scene
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./KeyButton":274,"./buttonAreaFactory":280}],286:[function(require,module,exports){
+},{"./KeyButton":274,"./buttonAreaFactory":279}],285:[function(require,module,exports){
 (function (global){
 var buttonAreaFactory = require('./buttonAreaFactory')
 var KeyButton = require('./KeyButton')
@@ -59687,8 +59610,18 @@ var levelFailScene = {
 
     global.baseStage.addChild(this.container)
 
+    // pick image
+    var themeNamesToImageNames = {
+      sunriseJungle: 'fail_jungle',
+      daylightCity: 'fail_daylight',
+      sunsetCity: 'fail_sunset',
+      nightCity: 'fail_night',
+    }
+
     // create animation layer
-    var image = new PIXI.Sprite(PIXI.loader.resources['fail_level_1'].texture)
+    var image = new PIXI.Sprite(
+        PIXI.loader.resources[
+            themeNamesToImageNames[global.levelManager.getCurrentLevel().theme.name]].texture)
     this.animationLayer.addChild(image)
     this.animationLayer.scale.y = global.renderer.view.height / this.animationLayer.height
     this.animationLayer.scale.x = this.animationLayer.scale.y
@@ -59766,7 +59699,7 @@ var levelFailScene = {
 module.exports = levelFailScene
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./KeyButton":274,"./buttonAreaFactory":280}],287:[function(require,module,exports){
+},{"./KeyButton":274,"./buttonAreaFactory":279}],286:[function(require,module,exports){
 (function (global){
 var buttonAreaFactory = require('./buttonAreaFactory')
 var KeyButton = require('./KeyButton')
@@ -59790,8 +59723,18 @@ var levelWonScene = {
 
     global.baseStage.addChild(this.container)
 
+    // pick image
+    var themeNamesToImageNames = {
+      sunriseJungle: 'finish_jungle',
+      daylightCity: 'finish_daylight',
+      sunsetCity: 'finish_sunset',
+      nightCity: 'finish_night',
+    }
+
     // create animation layer
-    var image = new PIXI.Sprite(PIXI.loader.resources['finish_level_1'].texture)
+    var image = new PIXI.Sprite(
+        PIXI.loader.resources[
+            themeNamesToImageNames[global.levelManager.getCurrentLevel().theme.name]].texture)
     this.animationLayer.addChild(image)
     this.animationLayer.scale.y = global.renderer.view.height / this.animationLayer.height
     this.animationLayer.scale.x = this.animationLayer.scale.y
@@ -59869,7 +59812,7 @@ var levelWonScene = {
 module.exports = levelWonScene
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./KeyButton":274,"./buttonAreaFactory":280}],288:[function(require,module,exports){
+},{"./KeyButton":274,"./buttonAreaFactory":279}],287:[function(require,module,exports){
 (function (global){
 var LevelManager = require('./LevelManager')
 var gameVars = require('./gameVars')
@@ -59883,9 +59826,19 @@ var loadScene = {
 
     global.levelManager
     .addLevel({
+      name: 'level6',
+      gameMode: global.levelManager.GAME_MODES.TUTORIAL_JUMP,
+      theme: gameVars.themes.sunriseJungle,
+    })
+    .addLevel({
       name: 'level5',
       gameMode: global.levelManager.GAME_MODES.TUTORIAL_JUMP,
       theme: gameVars.themes.sunriseJungle,
+    })
+    .addLevel({
+      name: 'level7',
+      gameMode: null,
+      theme: gameVars.themes.daylightCity,
     })
     .addLevel({
       name: 'level1',
@@ -59969,18 +59922,30 @@ var loadScene = {
     .add('balloonstring', 'assets/images/balloonstring.png')
     .add('indicator', 'assets/images/indicator.png')
     .add('spikes', 'assets/images/spikes.png')
+    .add('overlay', 'assets/images/overlay.png')
+    .add('ingame_instructions', 'assets/images/ingame_instructions.png')
+    .add('left_thumb', 'assets/images/left_thumb.png')
+    .add('right_thumb', 'assets/images/right_thumb.png')
     .add('level1', 'assets/json/level1.json') // TODO: bake this into bundle.js instead
     .add('level2', 'assets/json/level2.json') // TODO: bake this into bundle.js instead
     .add('level3', 'assets/json/level3.json') // TODO: bake this into bundle.js instead
     .add('level4', 'assets/json/level4.json') // TODO: bake this into bundle.js instead
     .add('level5', 'assets/json/level5.json') // TODO: bake this into bundle.js instead
+    .add('level6', 'assets/json/level6.json') // TODO: bake this into bundle.js instead
+    .add('level7', 'assets/json/level7.json') // TODO: bake this into bundle.js instead
     // .add('level' + sceneParams.level, 'assets/json/level' + sceneParams.level + '.json') // TODO: bake this into bundle.js instead
 
     // level fail scene
-    .add('fail_level_1', 'assets/images/fail_level_1.png')
+    .add('fail_jungle', 'assets/images/fail_jungle.png')
+    .add('fail_daylight', 'assets/images/fail_daylight.png')
+    .add('fail_sunset', 'assets/images/fail_sunset.png')
+    .add('fail_night', 'assets/images/fail_night.png')
 
     // level won scene
-    .add('finish_level_1', 'assets/images/finish_level_1.png')
+    .add('finish_jungle', 'assets/images/finish_jungle.png')
+    .add('finish_daylight', 'assets/images/finish_daylight.png')
+    .add('finish_sunset', 'assets/images/finish_sunset.png')
+    .add('finish_night', 'assets/images/finish_night.png')
 
     // intro 1 scene
     .add('intro1_bg', 'assets/images/intro1_bg.png')
@@ -60007,7 +59972,7 @@ var loadScene = {
 module.exports = loadScene
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./LevelManager":275,"./gameVars":283}],289:[function(require,module,exports){
+},{"./LevelManager":275,"./gameVars":282}],288:[function(require,module,exports){
 (function (global){
 var buttonAreaFactory = require('./buttonAreaFactory')
 var KeyButton = require('./KeyButton')
@@ -60092,10 +60057,10 @@ var splashScene = {
 module.exports = splashScene
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./KeyButton":274,"./buttonAreaFactory":280}],290:[function(require,module,exports){
-module.exports = "1.0.0-19"
+},{"./KeyButton":274,"./buttonAreaFactory":279}],289:[function(require,module,exports){
+module.exports = "1.0.0-20"
 
-},{}],291:[function(require,module,exports){
+},{}],290:[function(require,module,exports){
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -62955,4 +62920,4 @@ var SpriteUtilities = (function () {
 
 
 module.exports = SpriteUtilities
-},{}]},{},[284]);
+},{}]},{},[283]);
