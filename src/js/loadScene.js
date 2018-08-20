@@ -106,6 +106,10 @@ var loadScene = {
     .add('balloonstring', 'assets/images/balloonstring.png')
     .add('indicator', 'assets/images/indicator.png')
     .add('spikes', 'assets/images/spikes.png')
+    .add('overlay', 'assets/images/overlay.png')
+    .add('ingame_instructions', 'assets/images/ingame_instructions.png')
+    .add('left_thumb', 'assets/images/left_thumb.png')
+    .add('right_thumb', 'assets/images/right_thumb.png')
     .add('level1', 'assets/json/level1.json') // TODO: bake this into bundle.js instead
     .add('level2', 'assets/json/level2.json') // TODO: bake this into bundle.js instead
     .add('level3', 'assets/json/level3.json') // TODO: bake this into bundle.js instead

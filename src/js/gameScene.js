@@ -640,6 +640,7 @@ var gameScene = {
     var balloonStringLayer = new PIXI.Container()
     var propLayer = new PIXI.Container()
     var guiLayer = new PIXI.Container()
+    this.overlayLayer = new PIXI.Container()
     this.debugDrawContainer = new PIXI.Container()
 
     global.baseStage.addChild(this.container)
@@ -647,6 +648,7 @@ var gameScene = {
     this.container.addChild(this.backgroundLayer)
     this.container.addChild(this.stage)
     this.container.addChild(guiLayer)
+    this.container.addChild(this.overlayLayer)
     this.container.addChild(this.debugDrawContainer)
 
     this.stage.addChild(propLayer)
@@ -698,6 +700,48 @@ var gameScene = {
     guiLayer.addChild(indicatorContainer)
     guiLayer.addChild(leftButton)
     guiLayer.addChild(rightButton)
+
+    // set up overlay layer
+    var overlaySprite = new PIXI.Sprite(
+        PIXI.loader.resources['overlay'].texture)
+    overlaySprite.anchor.x = 0.5
+    overlaySprite.anchor.y = 0.5
+    overlaySprite.position.x = global.renderer.view.width / 2
+    overlaySprite.position.y = global.renderer.view.height / 2
+    overlaySprite.width = global.renderer.view.width
+    overlaySprite.height = global.renderer.view.width
+
+    this.overlayLayer.addChild(overlaySprite)
+
+    var leftThumb = new PIXI.Sprite(
+        PIXI.loader.resources['left_thumb'].texture)
+    leftThumb.anchor.x = 0
+    leftThumb.anchor.y = 1
+    leftThumb.position.x = 0
+    leftThumb.position.y = global.renderer.view.height
+
+    this.overlayLayer.addChild(leftThumb)
+
+    var rightThumb = new PIXI.Sprite(
+        PIXI.loader.resources['right_thumb'].texture)
+    rightThumb.anchor.x = 1
+    rightThumb.anchor.y = 1
+    rightThumb.position.x = global.renderer.view.width
+    rightThumb.position.y = global.renderer.view.height
+
+    this.overlayLayer.addChild(rightThumb)
+
+    var ingameInstructions = new PIXI.Sprite(
+        PIXI.loader.resources['ingame_instructions'].texture)
+    ingameInstructions.anchor.x = 0.5
+    ingameInstructions.anchor.y = 0.5
+    ingameInstructions.position.x = global.renderer.view.width / 2
+    ingameInstructions.position.y = global.renderer.view.height / 2
+
+    this.overlayLayer.addChild(ingameInstructions)
+
+    // how long to pause before showing instructions
+    this.instructionPauseTimer = 1000
 
     // set up physics
     createNinja()
@@ -781,8 +825,26 @@ var gameScene = {
     // leave previous/next positions accessible
     // (velocities are in units/ms)
 
-    if (isPaused) {
+    if (this.instructionPauseTimer > 0) {
+      this.instructionPauseTimer -= stepInMilliseconds
+      buttonEventQueue = [] // NOTE: empty the input
+      if (this.instructionPauseTimer < 0) {
+        isPaused = true
+      }
+    }
+
+    if (isPaused === true) {
+      if (this.overlayLayer.visible === false) {
+        this.overlayLayer.visible = true
+      }
+      if (buttonEventQueue.length > 0) {
+        isPaused = false
+      }
       return
+    } else if (isPaused === false) {
+      if (this.overlayLayer.visible === true) {
+        this.overlayLayer.visible = false
+      }
     }
 
     var stepInSeconds = stepInMilliseconds / 1000
