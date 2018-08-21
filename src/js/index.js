@@ -22,8 +22,10 @@ var turnDeviceElement
 var setUpGameRenderer = function () {
 
   // init pixi renderer
+  var height = window.innerHeight
+  var width = window.innerWidth
   var noWebgl = !!localStorage.getItem('vars:noWebgl')
-  var renderer = PIXI.autoDetectRenderer(window.innerWidth, window.innerHeight, {}, noWebgl)
+  var renderer = PIXI.autoDetectRenderer(width, height, {}, noWebgl)
   document.body.appendChild(renderer.view)
   renderer.backgroundColor = 0x261D05
 
@@ -93,7 +95,7 @@ windowLoad(function () {
         fpsText.text = 'fps: ' + Math.round(loop.getFps()) + '\nscreen orientation: ' + screenOrientation().direction
         global.renderer.render(global.appContainer)
 
-      } else {
+      } else { // PORTRAIT
 
         if (isGameShowing === true) {
           isGameShowing = false
@@ -130,7 +132,7 @@ windowLoad(function () {
       clearInterval(intervalId)
       global.loop.start()
 
-    } else {
+    } else { // PORTRAIT
 
       turnDeviceElement.style.visibility = 'visible'
     }
