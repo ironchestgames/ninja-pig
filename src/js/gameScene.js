@@ -709,7 +709,7 @@ var gameScene = {
     overlaySprite.position.x = global.renderer.view.width / 2
     overlaySprite.position.y = global.renderer.view.height / 2
     overlaySprite.width = global.renderer.view.width
-    overlaySprite.height = global.renderer.view.width
+    overlaySprite.height = global.renderer.view.height
 
     this.overlayLayer.addChild(overlaySprite)
 
@@ -737,6 +737,8 @@ var gameScene = {
     ingameInstructions.anchor.y = 0.5
     ingameInstructions.position.x = global.renderer.view.width / 2
     ingameInstructions.position.y = global.renderer.view.height / 2
+    ingameInstructions.height = global.renderer.view.height
+    ingameInstructions.scale.x = ingameInstructions.scale.y
 
     this.overlayLayer.addChild(ingameInstructions)
 
